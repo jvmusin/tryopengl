@@ -1,8 +1,11 @@
+import java.awt.*;
+
 @SuppressWarnings("WeakerAccess")
 public class Rectangle {
 
     private double x1, y1;
     private double x2, y2;
+    private Color color;
 
     public Rectangle(double x1, double y1, double x2, double y2) {
         this.x1 = x1;
@@ -23,10 +26,12 @@ public class Rectangle {
     public double y2() {
         return y2;
     }
-    public double dx() {
-        return x2 - x1;
+
+    public Color getColor() {
+        return color;
     }
-    public double dy() {
-        return y2 - y1;
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

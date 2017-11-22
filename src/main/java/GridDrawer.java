@@ -1,31 +1,33 @@
 import com.jogamp.opengl.GL2;
-import javafx.scene.paint.Color;
 
+import java.awt.*;
+
+@SuppressWarnings("WeakerAccess")
 public class GridDrawer extends Drawer {
 
+    private Color pixelColor;
     private Color backgroundColor;
 
-    @SuppressWarnings("WeakerAccess")
     public GridDrawer(Color backgroundColor, Color pixelColor, GL2 gl) {
-        super(null, pixelColor, gl);
+        super(null, gl);
         this.backgroundColor = backgroundColor;
+        this.pixelColor = pixelColor;
     }
 
-    @Override
-    protected void setup() {
-        super.setup();
-
+    protected void fillBackground() {
         gl.glClearColor(
-                (float) backgroundColor.getRed(),
-                (float) backgroundColor.getGreen(),
-                (float) backgroundColor.getBlue(),
-                (float) backgroundColor.getOpacity());
+                backgroundColor.getRed() / 255.0f,
+                backgroundColor.getGreen() / 255.0f,
+                backgroundColor.getBlue() / 255.0f,
+                backgroundColor.getAlpha() / 255.0f);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public Rectangle[][] draw(int rows, int columns, double squareSize, double delimSize) {
-        setup();
+    public Rectangle[][] draw(int rows, int columns, double squareSize, double delimSize, boolean refill) {
+        if (refill) {
+            fillBackground();
+            setColor(pixelColor);
+        }
 
         double cellSize = squareSize + delimSize;
         double fullHeight = cellSize * rows;
@@ -43,7 +45,7 @@ public class GridDrawer extends Drawer {
                 x2 = x2 / fullWidth * 2 - 1;
                 y2 = y2 / fullHeight * 2 - 1;
                 field[ix][iy] = new Rectangle(x1, y1, x2, y2);
-                gl.glRectd(x1, y1, x2, y2);
+                if (refill) drawRectangle(field[ix][iy], pixelColor);
             }
         }
 
