@@ -3,8 +3,12 @@ import java.util.Comparator;
 
 @SuppressWarnings("WeakerAccess")
 public class GouraudTriangleDrawer extends TriangleDrawer {
-    public GouraudTriangleDrawer(LineDrawer lineDrawer) {
+
+    private final GridDrawer drawer;
+
+    public GouraudTriangleDrawer(LineDrawer lineDrawer, GridDrawer drawer) {
         super(lineDrawer);
+        this.drawer = drawer;
     }
 
     public void drawTriangle(int[][] triangle, int dx, int dy) {
@@ -18,7 +22,7 @@ public class GouraudTriangleDrawer extends TriangleDrawer {
     private void colorVertices(int[][] triangle, int dx, int dy) {
         for (int i = 0; i < 3; i++) {
             int[] cur = triangle[i];
-            drawRectangle(field[cur[0] + dx][cur[1] + dy], colors[i]);
+            drawer.drawRectangle(cur[0] + dx, cur[1] + dy, colors[i]);
         }
     }
 

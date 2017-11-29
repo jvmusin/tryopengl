@@ -45,31 +45,27 @@ public class Main implements GLEventListener {
     public void display(GLAutoDrawable drawable) {
         if (tick++ % 10000 != 0) return;
 
-        Rectangle[][] field = drawGrid(rows, columns, 10, 3, true);
-        drawTriangles(field);
-        drawImages(new Drawer(field, gl) {});
+        GridDrawer gridDrawer = drawGrid(rows, columns, 10, 3, true);
+        drawTriangles(gridDrawer);
+        drawImages(gridDrawer);
 
         window.swapBuffers();
     }
 
-    private Rectangle[][] drawGrid(int rows, int columns, int squareSize, int delimSize, boolean fill) {
+    private GridDrawer drawGrid(int rows, int columns, int squareSize, int delimSize, boolean fill) {
         Color backgroundColor = Color.WHITE;
         Color pixelColor = Color.CYAN;
-        GridDrawer gridDrawer = new GridDrawer(backgroundColor, pixelColor, gl);
-        Rectangle[][] field = gridDrawer.draw(rows, columns, squareSize, delimSize, fill);
 
-        if (fill)
-            for (int x = 0; x < columns; x++)
-                for (int y = 0; y < rows / 2; y++)
-                    gridDrawer.drawRectangle(field[x][y], backgroundColor);
+        GridDrawer gridDrawer = new GridDrawer(rows, columns, squareSize, delimSize, gl);
+        if (fill) gridDrawer.fullRefill(pixelColor, backgroundColor);
 
-        return field;
+        return gridDrawer;
     }
 
-    private void drawTriangles(Rectangle[][] field) {
-        LineDrawer lineDrawer = new LineDrawer(field, gl);
-        GouraudTriangleDrawer gouraudTriangleDrawer = new GouraudTriangleDrawer(lineDrawer);
-        BarycentricTriangleDrawer barycentricTriangleDrawer = new BarycentricTriangleDrawer(lineDrawer);
+    private void drawTriangles(GridDrawer drawer) {
+        LineDrawer lineDrawer = new LineDrawer(drawer);
+        GouraudTriangleDrawer gouraudTriangleDrawer = new GouraudTriangleDrawer(lineDrawer, drawer);
+        BarycentricTriangleDrawer barycentricTriangleDrawer = new BarycentricTriangleDrawer(lineDrawer, drawer);
 
         int[][] points = {{16, 0}, {32, 9}, {32, 26}, {16, 35}, {0, 26}, {0, 9}};
         int[][][] triangles = {
@@ -87,31 +83,34 @@ public class Main implements GLEventListener {
             barycentricTriangleDrawer.drawTriangle(triangle, dx[1], dy);
         }
 
-        TextDrawer textDrawer = new TextDrawer(field, gl, window.getWidth(), window.getHeight());
-        textDrawer.draw("Gouraud method", field[dx[0] + 7][dy + 37]);
-        textDrawer.draw("Barycentric method", field[dx[1] + 5][dy + 37]);
+        TextDrawer textDrawer = new TextDrawer(window.getWidth(), window.getHeight());
+        textDrawer.draw("Gouraud method", drawer.getGlX(dx[0] + 7), drawer.getGlY(dy + 37));
+        textDrawer.draw("Barycentric method", drawer.getGlX(dx[1] + 5), drawer.getGlY(dy + 37));
     }
 
-    private void drawImages(Drawer drawer) {
-        int height = rows * scale;
-        int width = columns * scale;
-        Rectangle[][] field = drawGrid(height, width, 1, 0, false);
-
+    private void drawImages(GridDrawer drawer) {
+        for (int x = 0; x < drawer.getFieldWidth(); x++)
+            for (int y = 0; y < drawer.getFieldHeight() / 2; y++)
+                drawer.drawRectangle(x, y, Color.WHITE);
         drawer.drawLine(-1, 0, 1, 0, Color.RED, 3);
         drawer.drawLine(0, -1, 0, 1, Color.RED, 3);
 
+        int height = rows * scale;
+        int width = columns * scale;
+        drawer = drawGrid(height, width, 1, 0, false);
+
         Color[][] image = new ImageReader().readImage("image.bmp");
 
-        ImageDrawer imageDrawer = new ImageDrawer(field, gl);
-        TextDrawer textDrawer = new TextDrawer(field, gl, width, height);
+        ImageDrawer imageDrawer = new ImageDrawer(drawer);
+        TextDrawer textDrawer = new TextDrawer(width, height);
 
-        drawImage(image, 0, "Original image", imageDrawer, textDrawer);
+        drawImage(image, 0, "Original image", drawer, imageDrawer, textDrawer);
 
         image = new ImageStretcher().stretchImage(image, 1.4, 0.7);
-        drawImage(image, width / 2, "Stretched image", imageDrawer, textDrawer);
+        drawImage(image, width / 2, "Stretched image", drawer, imageDrawer, textDrawer);
     }
 
-    private void drawImage(Color[][] image, int dx, String name, ImageDrawer imageDrawer, TextDrawer textDrawer) {
+    private void drawImage(Color[][] image, int dx, String name, GridDrawer gridDrawer, ImageDrawer imageDrawer, TextDrawer textDrawer) {
         int width = columns * scale;
         int height = rows * scale;
 
@@ -123,7 +122,7 @@ public class Main implements GLEventListener {
         imageDrawer.drawImage(image, startX, startY);
 
         int textY = (height / 2 - imageHeight) / 2 + 5 + imageHeight;
-        textDrawer.draw(name, imageDrawer.field[width / 8 + 20 + dx][textY]);
+        textDrawer.draw(name, gridDrawer.getGlX(width / 8 + 20 + dx), gridDrawer.getGlY(textY));
     }
 
     @Override

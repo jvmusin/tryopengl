@@ -1,11 +1,12 @@
-import com.jogamp.opengl.GL2;
-
 import java.awt.*;
 
 @SuppressWarnings("WeakerAccess")
-public class ImageDrawer extends Drawer {
-    public ImageDrawer(Rectangle[][] field, GL2 gl) {
-        super(field, gl);
+public class ImageDrawer {
+
+    private final GridDrawer drawer;
+
+    public ImageDrawer(GridDrawer drawer) {
+        this.drawer = drawer;
     }
 
     public void drawImage(Color[][] image, int dx, int dy) {
@@ -15,7 +16,7 @@ public class ImageDrawer extends Drawer {
             for (int y = 0; y < height; y++) {
                 int y1 = height - y - 1;
                 Color color = image[x][y];
-                drawRectangle(field[x + dx][y1 + dy], color);
+                drawer.drawRectangle(x + dx, y1 + dy, color);
             }
         }
     }

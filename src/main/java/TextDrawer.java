@@ -1,25 +1,26 @@
-import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 import java.awt.*;
 
 @SuppressWarnings("WeakerAccess")
-public class TextDrawer extends Drawer {
+public class TextDrawer {
 
-    private final int windowWidth, windowHeight;
+    private final int windowWidth;
+    private final int windowHeight;
 
-    public TextDrawer(Rectangle[][] field, GL2 gl, int windowWidth, int windowHeight) {
-        super(field, gl);
+    public TextDrawer(int windowWidth, int windowHeight) {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
     }
 
-    public void draw(String text, Rectangle pos) {
+    public void draw(String text, double x, double y) {
         TextRenderer tr = new TextRenderer(new Font(null, Font.BOLD, 25));
 
         tr.beginRendering(windowWidth, windowHeight);
         tr.setColor(Color.BLACK);
-        tr.draw(text, normalize(pos.x1(), windowWidth), normalize(pos.y1(), windowHeight));
+        int xNorm = normalize(x, windowWidth);
+        int yNorm = normalize(y, windowHeight);
+        tr.draw(text, xNorm, yNorm);
         tr.endRendering();
     }
 

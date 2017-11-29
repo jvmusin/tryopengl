@@ -1,16 +1,16 @@
-import com.jogamp.opengl.GL2;
-
 import java.awt.*;
 
 @SuppressWarnings("WeakerAccess")
-public class LineDrawer extends Drawer {
+public class LineDrawer {
 
-    public LineDrawer(Rectangle[][] field, GL2 gl) {
-        super(field, gl);
+    private final GridDrawer drawer;
+
+    public LineDrawer(GridDrawer drawer) {
+        this.drawer = drawer;
     }
 
     public void drawLineWithColoredEnds(int x1, int y1, int x2, int y2) {
-        Color startColor = field[x1][y1].getColor();
+        Color startColor = drawer.getColor(x1, y1);
         int distX = x2 - x1;
         int distY = y2 - y1;
         boolean moveByX = Math.abs(distX) > Math.abs(distY);
@@ -19,11 +19,20 @@ public class LineDrawer extends Drawer {
         double dy = distY / (double) (iterationCount - 1);
 
         for (double x = x1, y = y1, i = 0; i < iterationCount; x += dx, y += dy, i++) {
-            Rectangle cur = field[(int) Math.round(x)][(int) Math.round(y)];
+            int curX = (int) Math.round(x);
+            int curY = (int) Math.round(y);
             Color newColor = iterationCount == 1
                     ? startColor :
-                    addVectorizedColor(startColor, field[x2][y2].getColor(), i / (double) (iterationCount - 1));
-            drawRectangle(cur, newColor);
+                    addVectorizedColor(startColor, drawer.getColor(x2, y2), i / (double) (iterationCount - 1));
+            drawer.drawRectangle(curX, curY, newColor);
         }
+    }
+
+    private Color addVectorizedColor(Color start, Color end, double mul) {
+        int r = (int) Math.round(start.getRed()   + (end.getRed()   - start.getRed())   * mul);
+        int g = (int) Math.round(start.getGreen() + (end.getGreen() - start.getGreen()) * mul);
+        int b = (int) Math.round(start.getBlue()  + (end.getBlue()  - start.getBlue())  * mul);
+        int a = (int) Math.round(start.getAlpha() + (end.getBlue()  - start.getAlpha()) * mul);
+        return new Color(r, g, b, a);
     }
 }

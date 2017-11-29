@@ -2,12 +2,11 @@ import java.awt.*;
 import java.util.Random;
 
 @SuppressWarnings("WeakerAccess")
-public abstract class TriangleDrawer extends Drawer {
+public abstract class TriangleDrawer {
     protected final LineDrawer lineDrawer;
     protected static Color[] colors = {Color.RED, Color.GREEN, Color.BLUE};
 
     public TriangleDrawer(LineDrawer lineDrawer) {
-        super(lineDrawer.field, lineDrawer.gl);
         this.lineDrawer = lineDrawer;
     }
 

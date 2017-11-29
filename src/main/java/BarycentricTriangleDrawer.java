@@ -3,8 +3,11 @@ import java.awt.*;
 @SuppressWarnings("WeakerAccess")
 public class BarycentricTriangleDrawer extends TriangleDrawer {
 
-    public BarycentricTriangleDrawer(LineDrawer lineDrawer) {
+    private final GridDrawer drawer;
+
+    public BarycentricTriangleDrawer(LineDrawer lineDrawer, GridDrawer drawer) {
         super(lineDrawer);
+        this.drawer = drawer;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class BarycentricTriangleDrawer extends TriangleDrawer {
                         b += coefficients[i] * colors[i].getBlue();
                         a += coefficients[i] * colors[i].getAlpha();
                     }
-                    drawRectangle(field[x + dx][y + dy], new Color(
+                    drawer.drawRectangle(x + dx, y + dy, new Color(
                             (int) Math.round(r),
                             (int) Math.round(g),
                             (int) Math.round(b),
@@ -79,7 +82,7 @@ public class BarycentricTriangleDrawer extends TriangleDrawer {
             int[] cur = triangle[i];
             int x = cur[0];
             int y = cur[1];
-            drawRectangle(field[x + dx][y + dy], colors[i]);
+            drawer.drawRectangle(x + dx, y + dy, colors[i]);
         }
     }
 }
