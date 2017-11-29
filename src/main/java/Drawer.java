@@ -13,6 +13,15 @@ public abstract class Drawer {
         this.gl = gl;
     }
 
+    public void drawLine(double x0, double y0, double x1, double y1, Color color, double lineWidth) {
+        setColor(color);
+        gl.glLineWidth((float) lineWidth);
+        gl.glBegin(GL2.GL_LINES);
+        gl.glVertex2d(x0, y0);
+        gl.glVertex2d(x1, y1);
+        gl.glEnd();
+    }
+
     protected void drawRectangle(Rectangle r, Color color) {
         setColor(color);
         r.setColor(color);

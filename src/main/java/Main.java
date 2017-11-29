@@ -97,27 +97,33 @@ public class Main implements GLEventListener {
         int width = columns * scale;
         Rectangle[][] field = drawGrid(height, width, 1, 0, false);
 
-        for (int x = 0; x < width; x++) drawer.drawRectangle(field[x][height / 2], Color.BLACK);
-        for (int y = 0; y < height; y++) drawer.drawRectangle(field[width / 2][y], Color.BLACK);
+        drawer.drawLine(-1, 0, 1, 0, Color.RED, 3);
+        drawer.drawLine(0, -1, 0, 1, Color.RED, 3);
 
         Color[][] image = new ImageReader().readImage("image.bmp");
+
+        ImageDrawer imageDrawer = new ImageDrawer(field, gl);
+        TextDrawer textDrawer = new TextDrawer(field, gl, width, height);
+
+        drawImage(image, 0, "Original image", imageDrawer, textDrawer);
+
+        image = new ImageStretcher().stretchImage(image, 1.4, 0.7);
+        drawImage(image, width / 2, "Stretched image", imageDrawer, textDrawer);
+    }
+
+    private void drawImage(Color[][] image, int dx, String name, ImageDrawer imageDrawer, TextDrawer textDrawer) {
+        int width = columns * scale;
+        int height = rows * scale;
+
         int imageWidth = image.length;
         int imageHeight = image[0].length;
 
-        ImageDrawer imageDrawer = new ImageDrawer(field, gl);
-
-        int startX = (width / 2 - imageWidth) / 2;
+        int startX = dx + (width / 2 - imageWidth) / 2;
         int startY = (height / 2 - imageHeight) / 2;
         imageDrawer.drawImage(image, startX, startY);
 
-        int newImageWidth = (int) (imageWidth * 1.4);
-        startX = width / 2 + (width / 2 - newImageWidth) / 2;
-        Color[][] newImage = new ImageStretcher().stretchImage(image, newImageWidth);
-        imageDrawer.drawImage(newImage, startX, startY);
-
-        TextDrawer textDrawer = new TextDrawer(field, gl, width, height);
-        textDrawer.draw("Original image", field[width / 8 + 20][height / 8 * 3]);
-        textDrawer.draw("Stretched image", field[width / 8 + 20 + width / 2][height / 8 * 3]);
+        int textY = (height / 2 - imageHeight) / 2 + 5 + imageHeight;
+        textDrawer.draw(name, imageDrawer.field[width / 8 + 20 + dx][textY]);
     }
 
     @Override

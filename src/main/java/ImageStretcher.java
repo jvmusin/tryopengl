@@ -2,9 +2,18 @@ import java.awt.*;
 
 @SuppressWarnings("WeakerAccess")
 public class ImageStretcher {
-    public Color[][] stretchImage(Color[][] image, int newImageWidth) {
+
+    public Color[][] stretchImage(Color[][] image, double coefX, double coefY) {
+        image = stretchImageByX(image, coefX);
+        image = stretchImageByY(image, coefY);
+        return image;
+    }
+
+    public Color[][] stretchImageByX(Color[][] image, double coef) {
         int imageWidth = image.length;
         int imageHeight = image[0].length;
+
+        int newImageWidth = (int) (imageWidth * coef);
         Color[][] newImage = new Color[newImageWidth][imageHeight];
 
         int l = 0;
@@ -16,6 +25,30 @@ public class ImageStretcher {
             for (int y = 0; y < imageHeight; y++) {
                 Color c1 = image[l][y];
                 Color c2 = image[l + 1][y];
+                Color newColor = sumColors(c1, c2, k);
+                newImage[x][y] = newColor;
+            }
+        }
+
+        return newImage;
+    }
+
+    public Color[][] stretchImageByY(Color[][] image, double coef) {
+        int imageWidth = image.length;
+        int imageHeight = image[0].length;
+
+        int newImageHeight = (int) (imageHeight * coef);
+        Color[][] newImage = new Color[imageWidth][newImageHeight];
+
+        int l = 0;
+        for (int y = 0; y < newImageHeight; y++) {
+            while (l + 2 < imageHeight && (l + 1.) / imageHeight * newImageHeight < y) l++;
+            double y0 = l / (double) imageHeight * newImageHeight;
+            double y1 = (l + 1.) / imageHeight * newImageHeight;
+            double k = 1 - (y - y0) / (y1 - y0);
+            for (int x = 0; x < imageWidth; x++) {
+                Color c1 = image[x][l];
+                Color c2 = image[x][l + 1];
                 Color newColor = sumColors(c1, c2, k);
                 newImage[x][y] = newColor;
             }
