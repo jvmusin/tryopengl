@@ -43,11 +43,57 @@ public class Main implements GLEventListener {
     private int tick;
     @Override
     public void display(GLAutoDrawable drawable) {
+        if (tick > 0) return;
         if (tick++ % 10000 != 0) return;
 
         GridDrawer gridDrawer = drawGrid(rows, columns, 10, 3, true);
-        drawTriangles(gridDrawer);
-        drawImages(gridDrawer);
+
+        int size = rows;
+        int border = 15;
+        int bot = border;
+        int top = size - border - 1;
+        int left = border;
+        int right = size - border - 1;
+
+        int curX = left;
+        int curY = bot;
+        int[] dx = {-1, 0, 1, 0};
+        int[] dy = {0, 1, 0, -1};
+        int dir = 1;
+        int step = size - border * 2;
+        for (int i = 0; i < 4; i++) {
+            double x0 = gridDrawer.getGlX(curX);
+            double y0 = gridDrawer.getGlY(curY);
+            curX += dx[dir % 4] * step;
+            curY += dy[dir % 4] * step;
+            dir++;
+            double x1 = gridDrawer.getGlX(curX);
+            double y1 = gridDrawer.getGlY(curY);
+            gridDrawer.drawLine(x0, y0, x1, y1, Color.BLACK, 5);
+        }
+
+        int[][] lines = {
+                {5, 5, size - 5, size - 20},
+                {20, 40, 30, 70},
+                {40, 50, 10, size - 5},
+                {10, 25, 10, 70},
+                {85, 30, 50, 40}
+        };
+        LineDrawer lineDrawer = new LineDrawer(gridDrawer);
+        Rectangle rect = new Rectangle(left, bot, right, top);
+        for (int[] line : lines) {
+            lineDrawer.drawLine2Colored(line[0], line[1], line[2], line[3], rect, Color.GREEN, Color.RED);
+        }
+
+//        for (int x = 0; x < gridDrawer.getFieldWidth(); x++) {
+//            for (int y = 0; y < gridDrawer.getFieldHeight(); y++) {
+//                if (y < bot || y > top)
+//                    gridDrawer.drawRectangle(x, y, Color.BLACK);
+//            }
+//        }
+
+//        drawTriangles(gridDrawer);
+//        drawImages(gridDrawer);
 
         window.swapBuffers();
     }
